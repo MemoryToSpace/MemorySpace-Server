@@ -1,0 +1,7 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('generate/', views.generate, name='generate'),
+    # Add more URL patterns as needed
+]
