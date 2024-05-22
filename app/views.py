@@ -27,8 +27,8 @@ def generate_image(request, data):
     try:
         data = json.loads(request.body.decode('utf-8'))
         received_text = data.get('prompt')
-        res = generate_image_request(received_text)
-        return JsonResponse({'image_url':res.self, 'image_id':res.id})
+        # res = generate_image_request(received_text)
+        return JsonResponse({data: received_text})
     except json.JSONDecodeError:
         return HttpResponseBadRequest('Invalid JSON format in request body.')
 
