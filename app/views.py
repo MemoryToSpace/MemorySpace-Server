@@ -21,6 +21,7 @@ def generate_test(request, data):
         return HttpResponseBadRequest('Invalid JSON format in request body.')
 
 
+@csrf_exempt
 @post_and_params_validator(['prompt'])
 def generate_image(request, data):
     try:
