@@ -4,7 +4,34 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from app.rest_decorators import post_and_params_validator
 import requests
+import openai
 
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+@csrf_exempt
+@post_and_params_validator(['text'])
+def generate_image_response(request, data):
+    """
+    This view function retrieves text from the 'text' variable in a JSON request body,
+    sends it to OpenAI's image generation API, and returns the generated image URL.
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        received_text = data.get('text')
+        
+        response = openai.Image.create(
+            prompt=received_text,
+            n=1,
+            size="1024x1024"  
+        )
+        
+        image_url = response['data'][0]['url']
+        
+        return JsonResponse({'input_text': received_text, 'image_url': image_url})
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest('Invalid JSON format in request body.')
+    except openai.error.OpenAIError as e:
+        return HttpResponseBadRequest(f'OpenAI API error: {str(e)}')
 
 @csrf_exempt
 @post_and_params_validator(['text'])
