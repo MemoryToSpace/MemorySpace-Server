@@ -8,6 +8,8 @@ import openai
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 @post_and_params_validator(['text'])
 def generate_image_response(request, data):
@@ -19,19 +21,32 @@ def generate_image_response(request, data):
         data = json.loads(request.body.decode('utf-8'))
         received_text = data.get('text')
         
+         if not received_text or not isinstance(received_text, str):
+            return HttpResponseBadRequest('The "text" field must be a non-empty string.')
+        
+        # Refine the prompt for better image generation
+        refined_prompt = f"Create a detailed and visually stunning image based on the following description: {received_text}"
+        
         response = openai.Image.create(
-            prompt=received_text,
+            prompt=refined_prompt,
             n=1,
-            size="1024x1024"  
+            size="1024x1024",
+            response_format="url"
         )
         
         image_url = response['data'][0]['url']
         
         return JsonResponse({'input_text': received_text, 'image_url': image_url})
+    
     except json.JSONDecodeError:
+        logger.error('Invalid JSON format in request body.')
         return HttpResponseBadRequest('Invalid JSON format in request body.')
     except openai.error.OpenAIError as e:
+        logger.error(f'OpenAI API error: {str(e)}')
         return HttpResponseBadRequest(f'OpenAI API error: {str(e)}')
+    except Exception as e:
+        logger.error(f'Unexpected error: {str(e)}')
+        return HttpResponseBadRequest(f'Unexpected error: {str(e)}')
 
 @csrf_exempt
 @post_and_params_validator(['text'])
