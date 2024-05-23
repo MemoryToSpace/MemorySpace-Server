@@ -15,7 +15,6 @@ def post_only(view_func):
     return wrapper
 
 
-
 def post_and_params_validator(params):
     """
   A decorator that checks for required parameters in the request body (JSON format).

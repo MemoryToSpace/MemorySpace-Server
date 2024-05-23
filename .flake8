@@ -1,0 +1,24 @@
+[flake8]
+# Ignore specific rules
+ignore = F401
+
+# Set the maximum allowed line length
+max-line-length = 120
+
+# Exclude specific files or directories from being checked
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    migrations
+
+# Specify the format for output messages
+format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s
+
+# Enable or disable specific Flake8 plugins
+enable-extensions = G
+disable-noqa = False
+
+# Additional options
+max-complexity = 10
