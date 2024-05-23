@@ -14,6 +14,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -141,3 +143,6 @@ if not DEBUG:
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Access the OpenAI API key
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')

@@ -18,7 +18,6 @@ requests = "^2.32.2"
 django-cors-headers = "^4.3.1"
 openai = "^1.30.2"
 
-
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
 pytest = "^8.2.1"
