@@ -4,11 +4,14 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from app.rest_decorators import post_and_params_validator
 import requests
-import openai
+from openai import OpenAI, OpenAIError
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+# Initialize the OpenAI client with the API key
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY environment variable not set")
 
-logger = logging.getLogger(__name__)
+client = OpenAI(api_key=openai_api_key)
 
 @csrf_exempt
 @post_and_params_validator(['text'])
@@ -21,17 +24,18 @@ def generate_image_response(request, data):
         data = json.loads(request.body.decode('utf-8'))
         received_text = data.get('text')
         
-         if not received_text or not isinstance(received_text, str):
+        if not received_text or not isinstance(received_text, str):
             return HttpResponseBadRequest('The "text" field must be a non-empty string.')
         
         # Refine the prompt for better image generation
         refined_prompt = f"Create a detailed and visually stunning image based on the following description: {received_text}"
         
-        response = openai.Image.create(
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=refined_prompt,
-            n=1,
             size="1024x1024",
-            response_format="url"
+            quality="standard",
+            n=1
         )
         
         image_url = response['data'][0]['url']
@@ -39,13 +43,10 @@ def generate_image_response(request, data):
         return JsonResponse({'input_text': received_text, 'image_url': image_url})
     
     except json.JSONDecodeError:
-        logger.error('Invalid JSON format in request body.')
         return HttpResponseBadRequest('Invalid JSON format in request body.')
-    except openai.error.OpenAIError as e:
-        logger.error(f'OpenAI API error: {str(e)}')
+    except OpenAIError as e:
         return HttpResponseBadRequest(f'OpenAI API error: {str(e)}')
     except Exception as e:
-        logger.error(f'Unexpected error: {str(e)}')
         return HttpResponseBadRequest(f'Unexpected error: {str(e)}')
 
 @csrf_exempt
