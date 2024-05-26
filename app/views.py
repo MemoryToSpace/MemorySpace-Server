@@ -65,12 +65,13 @@ def generate_test(request, data):
 
 
 @csrf_exempt
-@post_and_params_validator(['prompt'])
+@post_and_params_validator(['text'])
 def generate_image(request, data):
     try:
         data = json.loads(request.body.decode('utf-8'))
-        received_text = data.get('prompt')
-        res = generate_image_request(received_text)
+        received_text = data.get('text')
+        refined_prompt = f"Create a detailed and visually stunning image based on the following description: {received_text}"
+        res = generate_image_request(refined_prompt)
         return JsonResponse({'data': res})
     except json.JSONDecodeError:
         return HttpResponseBadRequest('Invalid JSON format in request body.')
