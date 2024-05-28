@@ -4,15 +4,14 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from app.rest_decorators import post_and_params_validator
 import requests
-import openai
-from openai.error import OpenAIError
+from openai import OpenAI, OpenAIError
 
 # Initialize the OpenAI client with the API key
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 if not openai_api_key:
     raise ValueError("OPENAI_API_KEY environment variable not set")
 
-openai.api_key = openai_api_key
+client = OpenAI(api_key=openai_api_key)
 
 @csrf_exempt
 @post_and_params_validator(['text'])
@@ -31,14 +30,17 @@ def generate_image_response(request, data):
         # Refine the prompt for better image generation
         refined_prompt = f"Create a detailed and visually stunning image based on the following description: {received_text}"
         
-        response = openai.Image.create(
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=refined_prompt,
-            n=1,
-            size="1024x1024"
+            size="1024x1024",
+            quality="standard",
+            n=1
         )
         
-        # The response is an object, not a dictionary. Access the attributes accordingly.
-        image_url = response['data'][0]['url']
+        print("OpenAI API Response:", response)
+
+        image_url = response.data[0].url
         
         return JsonResponse({'input_text': received_text, 'image_url': image_url})
     
