@@ -4,7 +4,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from app.rest_decorators import post_and_params_validator
 import requests
-from openai import OpenAI, OpenAIError
+import openai
+from openai.error import OpenAIError
 
 # Initialize the OpenAI client with the API key
 openai_api_key = os.environ.get("OPENAI_API_KEY")
