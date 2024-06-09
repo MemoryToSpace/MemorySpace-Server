@@ -28,7 +28,7 @@ def generate_image_response(request, data):
             return HttpResponseBadRequest('The "text" field must be a non-empty string.')
         
         # Refine the prompt for better image generation
-        refined_prompt = f"Create a detailed and visually stunning image based on the following description: {received_text}"
+        refined_prompt = f"Create a 3d view that visually represents the key elements and emotions from the following memory: --> {received_text}. --> Include relevant architectural styles, landscapes, and significant features as described"
         
         response = client.images.generate(
             model="dall-e-3",
